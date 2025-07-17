@@ -1,0 +1,78 @@
+import { useState } from "react";
+import { PORTFOLIO_ITEMS } from "@/lib/constants";
+
+type PortfolioCategory = "all" | "instagram" | "posters" | "magazines" | "logos" | "illustrations";
+
+interface PortfolioGalleryProps {
+  onImageClick: (image: { src: string; alt: string }) => void;
+}
+
+export default function PortfolioGallery({ onImageClick }: PortfolioGalleryProps) {
+  const [activeFilter, setActiveFilter] = useState<PortfolioCategory>("all");
+
+  const filters = [
+    { key: "all" as const, label: "All", gradient: "from-purple-500 to-pink-500" },
+    { key: "instagram" as const, label: "Instagram", gradient: "from-blue-500 to-cyan-500" },
+    { key: "posters" as const, label: "Movie Posters", gradient: "from-green-500 to-yellow-500" },
+    { key: "magazines" as const, label: "Magazines", gradient: "from-orange-500 to-red-500" },
+    { key: "logos" as const, label: "Logos", gradient: "from-indigo-500 to-purple-500" },
+    { key: "illustrations" as const, label: "Illustrations", gradient: "from-pink-500 to-red-500" },
+  ];
+
+  const filteredItems = activeFilter === "all" 
+    ? PORTFOLIO_ITEMS 
+    : PORTFOLIO_ITEMS.filter(item => item.category === activeFilter);
+
+  return (
+    <section id="portfolio" className="py-20">
+      <div className="container mx-auto px-6">
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 gradient-text font-space">
+          Portfolio
+        </h2>
+        
+        {/* Portfolio Filters */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          {filters.map((filter) => (
+            <button
+              key={filter.key}
+              onClick={() => setActiveFilter(filter.key)}
+              className={`px-6 py-3 rounded-full font-medium transition-all ${
+                activeFilter === filter.key
+                  ? `bg-gradient-to-r ${filter.gradient}`
+                  : "bg-dark-gray hover:bg-gradient-to-r hover:from-blue-500 hover:to-cyan-500"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Portfolio Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredItems.map((item) => (
+            <div
+              key={item.id}
+              className="portfolio-item bg-dark-gray rounded-2xl overflow-hidden shadow-lg"
+              style={{
+                opacity: 1,
+                transform: "translateY(0)",
+                transition: "all 0.3s ease",
+              }}
+            >
+              <img
+                src={item.image}
+                alt={item.alt}
+                className="w-full h-64 object-cover cursor-pointer"
+                onClick={() => onImageClick({ src: item.image, alt: item.alt })}
+              />
+              <div className="p-6">
+                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                <p className="text-light-gray text-sm">{item.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
